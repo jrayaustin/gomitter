@@ -9,16 +9,20 @@ func TestCorrectEventData(t *testing.T) {
 	stringData := "stringData"
 	intData := 5
 	payload := Payload{stringData, intData}
+	cb := make(chan Payload)
 
-	cb := func(p Payload) {
-		if p.StringData != stringData {
-			t.Error("String data does not match")
-		}
+	go func() {
+		for i := 0; ; i++ {
+			p := <-cb
+			if p.StringData != stringData {
+				t.Error("String data does not match")
+			}
 
-		if p.IntData != intData {
-			t.Error("Int data does not match")
+			if p.IntData != intData {
+				t.Error("Int data does not match")
+			}
 		}
-	}
+	}()
 
 	err := g.On("foo", cb)
 
@@ -27,6 +31,7 @@ func TestCorrectEventData(t *testing.T) {
 	}
 
 	g.Emit("foo", payload)
+
 }
 
 func TestDuplicateEvent(t *testing.T) {
@@ -34,18 +39,26 @@ func TestDuplicateEvent(t *testing.T) {
 	stringData := "stringData"
 	intData := 5
 	payload := Payload{stringData, intData}
+	cb := make(chan Payload)
 
-	cb := func(p Payload) {
-		if p.StringData != stringData {
-			t.Error("String data does not match")
-		}
+	go func() {
+		for i := 0; ; i++ {
+			p := <-cb
+			if p.StringData != stringData {
+				t.Error("String data does not match")
+			}
 
-		if p.IntData != intData {
-			t.Error("Int data does not match")
+			if p.IntData != intData {
+				t.Error("Int data does not match")
+			}
 		}
-	}
+	}()
 
 	err := g.On("foo", cb)
+
+	if err != nil {
+		t.Error(err)
+	}
 
 	if err != nil {
 		t.Error(err)
@@ -58,4 +71,5 @@ func TestDuplicateEvent(t *testing.T) {
 	}
 
 	g.Emit("foo", payload)
+
 }

@@ -9,7 +9,7 @@ type Payload struct {
 	IntData    int
 }
 
-type Callback func(Payload)
+type Callback chan Payload
 
 type EventStore map[string]Callback
 
@@ -34,10 +34,10 @@ func (g *Gomitter) On(event string, cb Callback) error {
 }
 
 func (g *Gomitter) Emit(event string, payload Payload) error {
-	callback, ok := g.Events[event]
+	callbackChan, ok := g.Events[event]
 
 	if ok {
-		callback(payload)
+		callbackChan <- payload
 		return nil
 	} else {
 		return errors.New("Unknown event " + event)
