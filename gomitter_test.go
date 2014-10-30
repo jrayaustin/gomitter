@@ -15,8 +15,8 @@ func TestCorrectEventData(t *testing.T) {
 
 	wg.Add(1)
 	go func() {
-		for i := 0; ; i++ {
-			p := <-cb
+		select {
+		case p := <-cb:
 			if p.StringData != stringData {
 				t.Error("String data does not match")
 			}
@@ -49,8 +49,8 @@ func TestDuplicateEvent(t *testing.T) {
 
 	wg.Add(1)
 	go func() {
-		for i := 0; ; i++ {
-			p := <-cb
+		select {
+		case p := <-cb:
 			if p.StringData != stringData {
 				t.Error("String data does not match")
 			}
@@ -80,5 +80,4 @@ func TestDuplicateEvent(t *testing.T) {
 
 	g.Emit("foo", payload)
 	wg.Wait()
-
 }
