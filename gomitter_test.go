@@ -1,6 +1,7 @@
 package gomitter
 
 import (
+	"sync"
 	"testing"
 )
 
@@ -10,7 +11,9 @@ func TestCorrectEventData(t *testing.T) {
 	intData := 5
 	payload := Payload{stringData, intData}
 	cb := make(chan Payload)
+	var wg sync.WaitGroup
 
+	wg.Add(1)
 	go func() {
 		for i := 0; ; i++ {
 			p := <-cb
@@ -21,6 +24,7 @@ func TestCorrectEventData(t *testing.T) {
 			if p.IntData != intData {
 				t.Error("Int data does not match")
 			}
+			wg.Done()
 		}
 	}()
 
@@ -31,6 +35,7 @@ func TestCorrectEventData(t *testing.T) {
 	}
 
 	g.Emit("foo", payload)
+	wg.Wait()
 
 }
 
@@ -40,7 +45,9 @@ func TestDuplicateEvent(t *testing.T) {
 	intData := 5
 	payload := Payload{stringData, intData}
 	cb := make(chan Payload)
+	var wg sync.WaitGroup
 
+	wg.Add(1)
 	go func() {
 		for i := 0; ; i++ {
 			p := <-cb
@@ -51,6 +58,7 @@ func TestDuplicateEvent(t *testing.T) {
 			if p.IntData != intData {
 				t.Error("Int data does not match")
 			}
+			wg.Done()
 		}
 	}()
 
@@ -71,5 +79,6 @@ func TestDuplicateEvent(t *testing.T) {
 	}
 
 	g.Emit("foo", payload)
+	wg.Wait()
 
 }
