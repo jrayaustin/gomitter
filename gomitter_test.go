@@ -81,3 +81,33 @@ func TestDuplicateEvent(t *testing.T) {
 	g.Emit("foo", payload)
 	wg.Wait()
 }
+
+func TestDetatchEvent(t *testing.T) {
+	g := &Gomitter{}
+	stringData := "stringData"
+	intData := 5
+	payload := Payload{stringData, intData}
+	cb := make(chan Payload)
+
+	err := g.On("foo", cb)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	sameCb, detatchErr := g.Detatch("foo")
+
+	if detatchErr != nil {
+		t.Error(detatchErr)
+	}
+
+	if sameCb != cb {
+		t.Error("Callback not the same")
+	}
+
+	emitErr := g.Emit("foo", payload)
+
+	if emitErr == nil {
+		t.Error("Should not be able to emit a detatched event")
+	}
+}

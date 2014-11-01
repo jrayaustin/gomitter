@@ -43,3 +43,14 @@ func (g *Gomitter) Emit(event string, payload Payload) error {
 		return errors.New("Unknown event " + event)
 	}
 }
+
+func (g *Gomitter) Detatch(event string) (Callback, error) {
+	cbChan, ok := g.Events[event]
+
+	if ok {
+		delete(g.Events, event)
+		return cbChan, nil
+	} else {
+		return nil, errors.New("Event channel " + event + " does not exist")
+	}
+}
